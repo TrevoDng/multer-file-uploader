@@ -44,7 +44,11 @@ app.post("/api/fileanalyse", upload.single("upfile"), (req, res) => {
   fileInfo.fileType = req.file.mimetype;
   fileInfo.fileSize = req.file.size;
 
-  res.json(fileInfo.fileName);
+  res.json({
+    name: fileInfo.fileName,
+    type: fileInfo.fileType,
+    size: fileInfo.fileSize,
+  });
 });
 
 app.get("/api/fileanalyse", (req, res) => {
