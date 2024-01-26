@@ -38,7 +38,7 @@ const upload = multer({
 let fileInfo = new Object();
 
 app.post("/api/fileanalyse", upload.single("upfile"), (req, res) => {
-  console.log(req.file);
+  //console.log(req.file);
   //const stats = fs.statSync(upfile);
   fileInfo.fileName = req.file.originalname;
   fileInfo.fileType = req.file.mimetype;
@@ -52,7 +52,7 @@ app.post("/api/fileanalyse", upload.single("upfile"), (req, res) => {
 });
 
 app.get("/api/fileanalyse", (req, res) => {
-  console.log(req.file);
+  //console.log(req.file);
   //const stats = fs.statSync(upfile);
   res.json({
     name: fileInfo.fileName,
