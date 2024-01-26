@@ -1,53 +1,64 @@
-var express = require('express');
-var cors = require('cors');
-require('dotenv').config()
+var express = require("express");
+var cors = require("cors");
+require("dotenv").config();
 
-const fs = require('fs');
-const bodyparser = require('body-parser');
+const fs = require("fs");
+const bodyparser = require("body-parser");
 var app = express();
 
-const multer = require('multer');
-const { type } = require('os');
+const multer = require("multer");
+const { type } = require("os");
 
 app.use(bodyparser.json());
-app.use(bodyparser.urlencoded({ extended: true }))
+app.use(bodyparser.urlencoded({ extended: true }));
 app.use(cors());
-app.use('/public', express.static(process.cwd() + '/public'));
+app.use("/public", express.static(process.cwd() + "/public"));
 
-app.get('/', function (req, res) {
-  res.sendFile(process.cwd() + '/views/index.html');
+app.get("/", function (req, res) {
+  res.sendFile(process.cwd() + "/views/index.html");
 });
 
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
-  cb(null, 'public/');
+    cb(null, "public/");
   },
   filename: function (req, file, cb) {
-  //console.log(\"=====>\", file.originalname)
-  cb(null, Date.now() + "-" + file.originalname);
-  }
-  });
+    //console.log(\"=====>\", file.originalname)
+    cb(null, Date.now() + "-" + file.originalname);
+  },
+});
 
-  const upload = multer({
+const upload = multer({
   storage: storage,
   limits: {
-  fileSize: 1024 * 1024
-  }
-  });
+    fileSize: 1024 * 1024,
+  },
+});
 
-app.post("/api/fileanalyse", upload.single("upfile"), (req, res)=> {
-  console.log(req.file)
+let fileInfo = new Object();
+
+app.post("/api/fileanalyse", upload.single("upfile"), (req, res) => {
+  console.log(req.file);
+  //const stats = fs.statSync(upfile);
+  fileInfo.fileName = req.file.originalname;
+  fileInfo.fileType = req.file.mimetype;
+  fileInfo.fileSize = req.file.size;
+
+  res.json(fileInfo.fileName);
+});
+
+app.get("/api/fileanalyse", (req, res) => {
+  console.log(req.file);
   //const stats = fs.statSync(upfile);
   res.json({
-    name: req.file.originalname,
-    type: req.file.mimetype,
-    size: req.file.size
-  })
+    name: fileInfo.fileName,
+    type: fileInfo.fileType,
+    size: fileInfo.fileSize,
+  });
   //res.send({result: 'ok'});
-})
-
+});
 
 const port = process.env.PORT || 3000;
 app.listen(port, function () {
-  console.log('Your app is listening on port ' + port)
+  console.log("Your app is listening on port " + port);
 });
